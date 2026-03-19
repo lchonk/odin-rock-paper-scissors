@@ -1,3 +1,6 @@
+let humanScore = 0;
+let computerScore = 0;
+
 function getComputerChoice(){
     let computerChoice = "";
     const randomNumber = Math.random();
@@ -29,15 +32,15 @@ function playRound(humanSelection, computerSelection){
         case "rock": {
             switch(computerSelection) {
                 case "rock": {
-                    console.log("It's a tie! No one gets a point.")
+                    message.textContent = "It's a tie! No one gets a point."
                     break;
                 }
                 case "paper": {
-                    console.log("Computer wins. Paper beats Rock.")
+                    message.textContent = "Computer wins. Paper beats Rock."
                     break;
                 }
                 case "scissors":{
-                    console.log("Human wins. Rock beats Scissors.")
+                    message.textContent = "Human wins. Rock beats Scissors."
                     hasPlayerWon = true;
                     break;
                 }
@@ -85,35 +88,77 @@ function playRound(humanSelection, computerSelection){
         }
         default:
     }
-    return hasPlayerWon;
+
+    hasPlayerWon ? humanScore++ : computerScore++;
+    logScoreBoard(humanScore, computerScore);
+    updateMessage();
 }
 
-function playGame(){
-    let humanScore = 0;
-    let computerScore = 0;
-    for(let i = 0; i < 5; i++){
-        const computerSelection = getComputerChoice();
-        const humanSelection = getHumanChoice();
-        
-        console.log("Computer: " + computerSelection);
-        console.log("Human: " + humanSelection);
-        const hasPlayerWon = playRound(humanSelection, computerSelection);
-        hasPlayerWon ? humanScore++ : computerScore++;
-        logScoreBoard(humanScore, computerScore);
-    }
+const container = document.querySelector("div");
 
-    if(humanScore > computerScore) {
-        console.log("Congratulation, the human has won. The fight against the machine continues!");
-    } else {
-        console.log("The machine have overcome human intuition. Is this the end?")
-    }
-}
 
-function logScoreBoard(humanScore, computerScore){
-    console.log(`
+const result = document.createElement("div");
+result.textContent=`
     Human Score: ${humanScore}
     Computer Score: ${computerScore}
-`);
-}
+    `;
+container.appendChild(result);
 
-playGame();
+const rockBtn = document.createElement("button");
+rockBtn.textContent = "Rock";
+container.appendChild(rockBtn);
+
+const paperBtn = document.createElement("button");
+paperBtn.textContent = "Paper";
+container.appendChild(paperBtn);
+
+const scissorsBtn = document.createElement("button");
+scissorsBtn.textContent = "Button";
+container.appendChild(scissorsBtn);
+
+const message = document.createElement("div");
+message.textContent = "";
+container.appendChild(message);
+
+const buttons = document.querySelectorAll("button");
+buttons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+        const computerChoice = getComputerChoice();
+        let hasPlayerWon = false;
+        switch(e.target){
+            case rockBtn: {
+                playRound("rock", computerChoice);
+                break;
+            }
+            case paperBtn: {
+                playRound("paper", computerChoice);
+                break;
+            }
+            case scissorsBtn: {
+                playRound("scissors", computerChoice);
+                break;
+            }
+            default:
+        }
+    })
+})
+
+function checkWinCondition(){
+    if (humanScore >= 5 || computerScore >= 5){
+        return true;
+    }
+    return false;
+}
+function logScoreBoard(humanScore, computerScore){
+    result.textContent=`
+    Human Score: ${humanScore}
+    Computer Score: ${computerScore}
+    `;
+}
+function updateMessage(){
+
+    if(checkWinCondition()){
+        const winner = humanScore > computerScore ? "Human" : "Computer";
+        message.textContent = `${winner} has won the game!`;
+    }
+}
